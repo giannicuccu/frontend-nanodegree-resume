@@ -150,8 +150,11 @@
         },
 
         renderMap: ()=>{
+
             let parent = document.getElementById('main');
+
             parent.insertAdjacentHTML('beforeend','<div id="mapDiv"><h2>Where I\'ve Lived and Worked</h2><div id="map"></div></div>')
+            
             let map;
            
             let mapOptions = {
@@ -162,7 +165,9 @@
 
                        
             locationFinder = () => {
-                let locations = [];    
+                
+                let locations = []; 
+
                 locations.push(model.person.bio.contacts.location);
                 
                 model.person.education.schools.forEach(function(school){
@@ -213,30 +218,30 @@
                 map.setCenter(bounds.getCenter());
               };
 
-        callback = (results, status) => {
-                if (status == google.maps.places.PlacesServiceStatus.OK) {
-                  createMapMarker(results[0]);
-                }
-              };
+            callback = (results, status) => {
+                    if (status == google.maps.places.PlacesServiceStatus.OK) {
+                    createMapMarker(results[0]);
+                    }
+                };
 
-        pinPoster = (locations) => {
+            pinPoster = (locations) => {
 
-                // creates a Google place search service object. PlacesService does the work of
-                // actually searching for location data.
-                var service = new google.maps.places.PlacesService(map);
-            
-                // Iterates through the array of locations, creates a search object for each location
-                  locations.forEach(function(place){
-                  // the search request object
-                  var request = {
-                    query: place
-                  };
-            
-                  // Actually searches the Google Maps API for location data and runs the callback
-                  // function with the search results after each search.
-                  service.textSearch(request, callback);
-                });
-              };
+                    // creates a Google place search service object. PlacesService does the work of
+                    // actually searching for location data.
+                    var service = new google.maps.places.PlacesService(map);
+                
+                    // Iterates through the array of locations, creates a search object for each location
+                    locations.forEach(function(place){
+                    // the search request object
+                    var request = {
+                        query: place
+                    };
+                
+                    // Actually searches the Google Maps API for location data and runs the callback
+                    // function with the search results after each search.
+                    service.textSearch(request, callback);
+                    });
+                };
 
             window.mapBounds = new google.maps.LatLngBounds();
 
@@ -250,8 +255,7 @@
             // Vanilla JS way to listen for resizing of the window
             // and adjust map bounds
             window.addEventListener('resize', function(e) {
-            //Make sure the map bounds get updated on page resize
-             map.fitBounds(mapBounds);
+            map.fitBounds(mapBounds);
             });
 
               
@@ -436,7 +440,7 @@
     
 })();
 
-//console.log(model);
+
 
 
 
