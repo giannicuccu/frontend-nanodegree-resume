@@ -1,3 +1,6 @@
+/* eslint-disable */
+
+
 /*
 
 This file contains all of the code running in the background that makes resumeBuilder.js possible. We call these helper functions because they support your code in this course.
@@ -48,6 +51,10 @@ var HTMLschoolDegree = ' -- %data%</a>';
 var HTMLschoolDates = '<div class="date-text">%data%</div>';
 var HTMLschoolLocation = '<div class="location-text">%data%</div>';
 var HTMLschoolMajor = '<em><br>Major: %data%</em>';
+///
+var HTMLschoolView = '<div class="education-entry"><a href="%url%">%name% -- %degree%</a><div class="date-text">%dates%</div><div class="location-text">%location%</div><em><br>Major: %major%</em></div>';
+///////////////////
+
 
 var HTMLonlineClasses = '<h3>Online Classes</h3>';
 var HTMLonlineTitle = '<a href="#">%data%';
