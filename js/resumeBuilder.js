@@ -1,18 +1,19 @@
-(function resume() {
+( resume = function() {
 
     const model = {
-        person: {}
+        person:{}
     };
 
     Object.defineProperty(model, 'person', {
         // value: JSON.parse(localStorage.attendance),
         // writable: false,
         get: function () {
-            return person;
+            return this._person; // _ avoid recursion error
         },
 
         set: function (source) {
-            person = new Person(source);
+              this._person = new Person(source);   // _ avoid recursion error
+             
         },
 
     });
@@ -42,6 +43,14 @@
         displayProjects: () => {
             let projectsData = model.person.projects.display();
             view.renderProjects(projectsData);
+        },
+
+        displayMap: () => {            
+            view.renderMap();
+        },
+
+        displayFooter: () => {            
+            view.renderFooter();
         }
 
 
@@ -49,9 +58,7 @@
 
 
     const view = {
-        render: () => {
-
-        },
+ 
 
         renderHeader: (bio) => {
 
@@ -92,31 +99,16 @@
                                     <div class="location-text">${school.location}</div>
                                     <em><br>Major: ${school.majors.join(' | ')}</em>
                                 </div>`;
-                // let schoolrow = `${
-                //     HTMLschoolView
-                //         .replace('%url%',school.url || '#')
-                //         .replace('%name%',school.name)
-                //         .replace('%degree%',school.degree)
-                //         .replace('%dates%',school.dates)
-                //         .replace('%location%',school.location)
-                //         .replace('%major%',school.majors.join(', '))
-                // }`
-                //  let schoolt = Object.keys(school).reduce((acc,v) => { 
-                //      return acc + '';},'');
+                
                 template += schoolrow;
-            }
-                
-                    
-                    
-                
-            
-            template += `</div>`;
+            }        
 
+            template += `</div>`;
             parent.insertAdjacentHTML('beforeend', template);
         },
 
         renderWork: (work) => {
-            console.log(work);
+            
             let parent = document.getElementById('main');
             let template = `
             <div id="workExperience" class="gray">
@@ -132,18 +124,148 @@
             },'');
 
             template +=`</div>`;
-            console.log(template)
-
             parent.insertAdjacentHTML('beforeend', template);
         },
+
         renderProjects: (proj) => {
+            //console.log(proj);
             let parent = document.getElementById('main');
             let template = `
                 <div id="projects">
                 <h2>Projects</h2>`;
-
+                template += proj.projects.reduce((acc,v) => {
+                    //console.log()
+                    return acc += ` <div class="project-entry">
+                                    <a href="http://${v.title}">${v.title}</a>
+                                    <div class="date-text">${v.date}</div>
+                                    <p><br>${v.description}</p>
+                                    <img src="${v.images[0]}">
+                                    </div>`;
+                },'');
+    
+                
                 template +=`</div>`;
 
+            parent.insertAdjacentHTML('beforeend', template);
+        },
+
+        renderMap: ()=>{
+            let parent = document.getElementById('main');
+            parent.insertAdjacentHTML('beforeend','<div id="mapDiv"><h2>Where I\'ve Lived and Worked</h2><div id="map"></div></div>')
+            let map;
+           
+            let mapOptions = {
+                disableDefaultUI: true
+              };
+            
+            map = new google.maps.Map(document.querySelector('#map'), mapOptions);
+
+                       
+            locationFinder = () => {
+                let locations = [];    
+                locations.push(model.person.bio.contacts.location);
+                
+                model.person.education.schools.forEach(function(school){
+                locations.push(school.location);
+                });
+            
+                model.person.work.jobs.forEach(function(job){
+                locations.push(job.location);
+                
+                });
+                return locations;
+            };
+
+           
+
+            createMapMarker = (placeData) => {
+                // The next lines save location data from the search result object to local variables
+                var lat = placeData.geometry.location.lat();  // latitude from the place service
+                var lon = placeData.geometry.location.lng();  // longitude from the place service
+                var name = placeData.formatted_address;   // name of the place from the place service
+                var bounds = window.mapBounds;            // current boundaries of the map window
+            
+                // marker is an object with additional data about the pin for a single location
+                var marker = new google.maps.Marker({
+                  map: map,
+                  position: placeData.geometry.location,
+                  title: name
+                });
+            
+                // infoWindows are the little helper windows that open when you click
+                // or hover over a pin on a map. They usually contain more information
+                // about a location.
+                var infoWindow = new google.maps.InfoWindow({
+                  content: name
+                });
+            
+                // hmmmm, I wonder what this is about...
+                google.maps.event.addListener(marker, 'click', function() {
+                 alert('click')
+                });
+            
+                // this is where the pin actually gets added to the map.
+                // bounds.extend() takes in a map location object
+                bounds.extend(new google.maps.LatLng(lat, lon));
+                // fit the map to the new marker
+                map.fitBounds(bounds);
+                // center the map
+                map.setCenter(bounds.getCenter());
+              };
+
+        callback = (results, status) => {
+                if (status == google.maps.places.PlacesServiceStatus.OK) {
+                  createMapMarker(results[0]);
+                }
+              };
+
+        pinPoster = (locations) => {
+
+                // creates a Google place search service object. PlacesService does the work of
+                // actually searching for location data.
+                var service = new google.maps.places.PlacesService(map);
+            
+                // Iterates through the array of locations, creates a search object for each location
+                  locations.forEach(function(place){
+                  // the search request object
+                  var request = {
+                    query: place
+                  };
+            
+                  // Actually searches the Google Maps API for location data and runs the callback
+                  // function with the search results after each search.
+                  service.textSearch(request, callback);
+                });
+              };
+
+            window.mapBounds = new google.maps.LatLngBounds();
+
+                // locations is an array of location strings returned from locationFinder()
+            locations = locationFinder();
+
+            // pinPoster(locations) creates pins on the map for each location in
+            // the locations array
+            pinPoster(locations);
+
+            // Vanilla JS way to listen for resizing of the window
+            // and adjust map bounds
+            window.addEventListener('resize', function(e) {
+            //Make sure the map bounds get updated on page resize
+             map.fitBounds(mapBounds);
+            });
+
+              
+        },
+
+        renderFooter: ()=>{
+            let parent = document.getElementById('main');
+            let template =`
+            <div id="lets-connect" class="dark-gray">
+                <h2 class="orange center-text">Let's Connect</h2>
+                <ul id="footerContacts" class="flex-box">
+            </ul>
+            </div>
+            `;
             parent.insertAdjacentHTML('beforeend', template);
         }
 
@@ -204,8 +326,6 @@
     };
 
 
-
-
     const sourceJson = {
         bio: {
             name: 'Gianni',
@@ -224,7 +344,7 @@
         education: {
             schools: [{
                     name: 'Lic. Scient. ',
-                    location: 'Or',
+                    location: 'Oristano',
                     degree: 'diploma',
                     majors: ['major1', 'major2'],
                     dates: '1985-1990',
@@ -232,7 +352,7 @@
                 },
                 {
                     name: 'Ist. Levi',
-                    location: 'Cagliari',
+                    location: 'Quartu Sant\'Elena',
                     degree: 'IFTS',
                     majors: ['major1', 'major2'],
                     dates: '2000-2005',
@@ -257,17 +377,24 @@
         work: {
             jobs: [{
                     employer: 'Teamlogic srl',
-                    title: 'Webmaster',
+                    title: 'IT services',
                     location: 'Cagliari',
                     dates: '2014-2018',
                     description: 'Areaweb manager'
                 },
                 {
                     employer: 'INEA ',
-                    title: 'Webmaster',
+                    title: 'Ist. naz. economia agraria',
                     location: 'Cagliari',
                     dates: '2014-2016',
-                    description: 'Online surveys setup, management and report'
+                    description: 'Online surveys setup, management and data reporting'
+                },
+                {
+                    employer: 'Getidea ',
+                    title: 'Web agency',
+                    location: 'Cagliari',
+                    dates: '2008-2013',
+                    description: 'Webmaster'
                 }
             ]
         },
@@ -282,14 +409,14 @@
                 {
                     title: 'www.kissfromitaly.com',
                     date: '2016',
-                    description: 'travel startup',
+                    description: 'Travel startup',
                     images: []
 
                 },
                 {
                     title: 'www.serenafazio.it',
                     date: '2018',
-                    description: 'painter website',
+                    description: 'Artist personal website',
                     images: []
 
                 }
@@ -297,17 +424,24 @@
         }
     };
 
-
-
     octopus.initModel();
     octopus.displayHeader();
     octopus.displayWork();
     octopus.displayProjects();
     octopus.displayEducation();
+    octopus.displayMap();
+    octopus.displayFooter();
+    
 
-
-
+    
 })();
+
+//console.log(model);
+
+
+
+
+
 
 
 
