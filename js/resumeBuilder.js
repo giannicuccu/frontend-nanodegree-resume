@@ -1,4 +1,4 @@
-( resume = function() {
+(function(){
 
     const model = {
         person:{}
@@ -91,7 +91,7 @@
                 <div id="education" class="gray">
                 <h2>Education</h2>`;
             
-            for(school of edu.schools){
+            for(const school of edu.schools){
                 
                 let schoolrow = `<div class="education-entry">
                                     <a href="${school.url}">${school.name} -- ${school.degree}</a>
@@ -164,7 +164,7 @@
             map = new google.maps.Map(document.querySelector('#map'), mapOptions);
 
                        
-            locationFinder = () => {
+            function locationFinder() {
                 
                 let locations = []; 
 
@@ -183,7 +183,7 @@
 
            
 
-            createMapMarker = (placeData) => {
+            function createMapMarker(placeData)  {
                 // The next lines save location data from the search result object to local variables
                 var lat = placeData.geometry.location.lat();  // latitude from the place service
                 var lon = placeData.geometry.location.lng();  // longitude from the place service
@@ -218,13 +218,13 @@
                 map.setCenter(bounds.getCenter());
               };
 
-            callback = (results, status) => {
+            function callback(results, status) {
                     if (status == google.maps.places.PlacesServiceStatus.OK) {
                     createMapMarker(results[0]);
                     }
                 };
 
-            pinPoster = (locations) => {
+            function pinPoster(locations) {
 
                     // creates a Google place search service object. PlacesService does the work of
                     // actually searching for location data.
@@ -332,7 +332,7 @@
 
     const sourceJson = {
         bio: {
-            name: 'Gianni',
+            name: 'Gqq',
             role: 'Webmaster',
             contacts: {
                 mobile: '3209714202',
@@ -437,17 +437,4 @@
     octopus.displayFooter();
     
 
-    
-})();
-
-
-
-
-
-
-
-
-
-
-
-//
+})()

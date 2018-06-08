@@ -1,7 +1,7 @@
 {
   "name": "frontend-nanodegree-resume",
   "version": "1.0.0",
-  "description": "Review the Online Resume [Project Rubric](https://review.udacity.com/?_ga=1.189245867.12280332.1465333852#!/projects/2962818615/rubric).",
+  "description": "MVO refactorng of Review the Online Resume [Project Rubric](https://review.udacity.com/?_ga=1.189245867.12280332.1465333852#!/projects/2962818615/rubric).",
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -20,6 +20,11 @@
   },
   "homepage": "https://github.com/giannicuccu/frontend-nanodegree-resume#readme",
   "devDependencies": {
-    "gulp": "^3.9.1"
+    "babel-core": "^6.26.3",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.1",
+    "gulp-uglify": "^3.0.0"
   }
 }
